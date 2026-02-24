@@ -5,7 +5,7 @@
       data-enable-hover-dropdown
     >
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/" @click="scrollToTop">
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -488,6 +488,20 @@ export default class Navbar extends Vue {
         tab === AvailableTabs.Login
           ? this.formattedLoginURL
           : this.formattedSignupURL;
+    }
+  }
+
+  scrollToTop(event: MouseEvent): void {
+    const scrollY =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      window.scrollY;
+    if (scrollY > 0) {
+      event.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
     }
   }
 }
