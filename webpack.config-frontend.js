@@ -155,6 +155,11 @@ module.exports = {
             )}.svg`;
           },
         },
+        {
+          from: './frontend/pwa/*',
+          to: path.resolve(__dirname, './frontend/www/'),
+          flatten: true,
+        },
       ],
     }),
     new VueLoaderPlugin(),

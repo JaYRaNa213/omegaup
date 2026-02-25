@@ -34,6 +34,10 @@
     <script src="/third_party/bootstrap-4.5.0/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% versionHash '/css/dist/omegaup_styles.css' %}">
     <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#004b80" />
+
+    <script type="text/javascript" src="/pwa-init.js" defer></script>
 
     {% if ENABLED_EXPERIMENTS %}
         <script type="text/plain" id="omegaup-enabled-experiments">{{ ENABLED_EXPERIMENTS|join(',') }}</script>
