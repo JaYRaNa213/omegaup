@@ -3,6 +3,10 @@
   <head data-locale="{{ LOCALE }}">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1b5aab">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
 
     {% if NEW_RELIC_SCRIPT %}
       {{ NEW_RELIC_SCRIPT|raw }}

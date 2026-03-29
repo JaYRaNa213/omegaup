@@ -3,6 +3,8 @@ import * as api from './api';
 import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
+import { saveSubmission } from '@/js/pwa/indexeddb';
+
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -483,7 +485,42 @@ export namespace omegaup {
           e.preventDefault();
         }
       });
+
+      // PWA: Service Worker registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('[PWA] SW registered:', registration.scope);
+              // PWA: Background Sync
+              if ('sync' in registration) {
+                return (registration as any).sync.register('submission-sync');
+              }
+            })
+            .catch((err) => {
+              console.error('[PWA] SW registration failed:', err);
+            });
+        });
+      }
     }
+
+    async simulateSubmission(code: string): Promise<void> {
+      if (navigator.onLine) {
+        console.log('[PWA] Submission simulated: online. Status: Submitted');
+        ui.info('Submission successful!');
+      } else {
+        const submission = {
+          id: Date.now().toString(),
+          code: code,
+          status: 'pending' as const,
+        };
+        await saveSubmission(submission);
+        console.log('[PWA] Submission saved to IndexedDB (offline)');
+        ui.info('Saved locally (Offline mode)');
+      }
+    }
+
 
     _notify(eventName: string): void {
       if (!Object.prototype.hasOwnProperty.call(this._listeners, eventName))

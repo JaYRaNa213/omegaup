@@ -1,0 +1,22 @@
+{
+  "name": "omegaUp",
+  "short_name": "omegaUp",
+  "description": "The algorithmic contest platform for Ibero-America.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1b5aab",
+  "icons": [
+    {
+      "src": "/media/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/media/omegaup-logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
