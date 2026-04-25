@@ -3,7 +3,7 @@ const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
@@ -158,15 +158,15 @@ module.exports = {
       ],
     }),
     new VueLoaderPlugin(),
-    new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        extensions: {
-          vue: true,
-        },
-      },
-      formatter: 'codeframe',
-      async: false,
-    }),
+    // new ForkTsCheckerWebpackPlugin({
+    //   typescript: {
+    //     extensions: {
+    //       vue: true,
+    //     },
+    //   },
+    //   formatter: 'codeframe',
+    //   async: false,
+    // }),
   ],
 
   optimization: {
@@ -216,17 +216,24 @@ module.exports = {
   },
 
   module: {
-    noParse: /^(vue|vue-router|vuex|vuex-router-sync)$/,
+    noParse: /^(vue-router|vuex|vuex-router-sync)$/,
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          compilerOptions: {
-            whitespace: 'condense',
+        use: [
+          {
+            loader: 'vue-loader',
+            options: {
+              experimentalInlineMatchResource: true,
+              compilerOptions: {
+                compatConfig: {
+                  MODE: 2,
+                },
+                whitespace: 'condense',
+              },
+            },
           },
-          optimizeSSR: false,
-        },
+        ],
       },
       {
         test: /\.ts$/,
@@ -255,11 +262,29 @@ module.exports = {
       // inline scss styles on vue components
       {
         test: /\.css$/,
-        use: ['vue-style-loader', 'css-loader'],
+        use: [
+          'vue-style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
+        ],
       },
+
       {
         test: /\.scss$/,
-        use: ['vue-style-loader', 'css-loader', 'sass-loader'],
+        use: [
+          'vue-style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
+          'sass-loader',
+        ],
       },
       {
         test: /\.ttf$/,
@@ -274,10 +299,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      vue$: 'vue/dist/vue.common.js',
-      'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
-      jszip: 'jszip/dist/jszip.js',
-      pako: 'pako/dist/pako.min.js',
+      vue: '@vue/compat',
       '@': path.resolve(__dirname, './frontend/www/'),
     },
   },

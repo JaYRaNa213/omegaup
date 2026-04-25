@@ -10,6 +10,7 @@ import arena_ContestList, {
 import contestStore, { UrlParams } from './contestStore';
 
 OmegaUp.on('ready', () => {
+  console.log('VUE VERSION:', Vue.version);
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
   contestStore.commit('updateAll', payload.contests);
@@ -95,25 +96,24 @@ OmegaUp.on('ready', () => {
     }
   }
 
+  const state = Vue.observable({
+    contests: contestStore.state.contests,
+    countContests: contestStore.state.countContests,
+    query: payload.query,
+    tab,
+    page,
+    sortOrder,
+    filter,
+    pageSize: payload.pageSize,
+    loading: contestStore.state.loading,
+  });
+
   new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
-    data: () => ({
-      query: payload.query,
-    }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
-        props: {
-          contests: contestStore.state.contests,
-          countContests: contestStore.state.countContests,
-          query: this.query,
-          tab,
-          page,
-          sortOrder,
-          filter,
-          pageSize: payload.pageSize,
-          loading: contestStore.state.loading,
-        },
+        props: state,
         on: {
           'fetch-page': async ({
             params,
@@ -124,6 +124,14 @@ OmegaUp.on('ready', () => {
             urlObj: URL;
             shouldUpdateUrl?: boolean;
           }) => {
+            // Update reactive state when parameters change to trigger reactivity
+            if (params.tab_name) state.tab = params.tab_name as ContestTab;
+            if (params.page) state.page = params.page;
+            if (params.sort_order)
+              state.sortOrder = params.sort_order as ContestOrder;
+            if (params.filter) state.filter = params.filter as ContestFilter;
+            if (params.query !== undefined) state.query = params.query;
+
             for (const [key, value] of Object.entries(params)) {
               if (value) {
                 urlObj.searchParams.set(key, String(value));
@@ -138,6 +146,11 @@ OmegaUp.on('ready', () => {
               requestParams: params,
               name: params.tab_name,
             });
+
+            // Sync store state back to reactive object
+            state.contests = contestStore.state.contests;
+            state.countContests = contestStore.state.countContests;
+            state.loading = contestStore.state.loading;
           },
         },
       });

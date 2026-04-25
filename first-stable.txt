@@ -1,0 +1,73 @@
+. Install Required Dependencies
+You must align your Vue 3 versions and upgrade vue-loader to v17, as v15 is strictly for Vue 2.
+
+powershell
+# Install Vue 3 and Compat layer
+npm install vue@^3.3.0 @vue/compat@^3.3.0 @vue/compiler-sfc@^3.3.0
+# Upgrade vue-loader (REQUIRED for Vue 3/Compat)
+npm install vue-loader@^17.0.0 --save-dev
+2. Update Webpack Configuration (webpack.config-frontend.js)
+You need to point the application to the compatibility build and set the compiler to "Vue 2 Mode."
+
+A. Update Resolve Alias
+Change the vue alias to point to the compat build.
+
+javascript
+// Around line 276
+resolve: {
+  alias: {
+    // FROM: vue$: 'vue/dist/vue.common.js'
+    // TO:
+    vue: '@vue/compat',
+    '@': path.resolve(__dirname, './frontend/www/'),
+  }
+}
+B. Configure vue-loader for Stabilization
+Update the .vue rule to include the compatConfig. This is the most important step for the "no-migration" goal.
+
+javascript
+// Around line 221
+{
+  test: /\.vue$/,
+  loader: 'vue-loader',
+  options: {
+    compilerOptions: {
+      // MODE 2: Full Vue 2 compatibility. 
+      // This suppresses most Vue 3 breaking changes at the compiler level.
+      compatConfig: {
+        MODE: 2 
+      },
+      whitespace: 'condense',
+    },
+  },
+}
+3. Stabilize Entry Points (Critical Fix)
+The audit in migration-audit/03-entrypoints/vue-entrypoints.txt identified 102+ manual instances of new Vue(). The current pattern of passing static data to render functions will cause infinite request loops in Vue 3.
+
+The "Safe Boot" Pattern for all .ts entry points: Instead of passing raw objects to the render function, wrap them in a reactive state. This prevents the "Root Shadowing" effect that crashes @vue/compat.
+
+typescript
+// Example: frontend/www/js/omegaup/arena/contest_list.ts
+import { reactive } from 'vue';
+// 1. Define reactive state for the entry point
+const state = reactive({
+  contests: payload.contests,
+  tab: payload.tab,
+});
+// 2. Mount with Vue 2 syntax (Compat will handle it)
+new Vue({
+  el: '#main-container',
+  render: (h) => h(ContestList, { props: state }),
+});
+4. Handle "Mirrored Prop" Side Effects
+The audit found 690+ instances of mirroring props to local data (e.g., currentTab = this.tab). In Vue 3, if you have an immediate: true watcher on these, they may trigger $emit loops during the initial mount.
+
+Immediate Stabilization Action: If a component crashes with "Maximum call stack exceeded" upon enabling compat mode, check migration-audit/06-watchers/watchers.txt for that component. Temporarily disable immediate: true on any watchers that mirror props and move that initialization logic to the mounted() hook.
+
+5. Summary Checklist for Stabilization
+ Package.json: vue, @vue/compat, and @vue/compiler-sfc are all the same version (e.g., ^3.3.4).
+ Webpack: vue-loader is v17+ and has MODE: 2 in compilerOptions.
+ Webpack: vue is aliased to @vue/compat.
+ Entry Points: Manual new Vue calls are updated to use reactive() state objects to avoid re-render loops.
+By following this, you achieve Phase 1 Stability: the app runs on Vue 3, but every component still thinks it's in Vue 2, buying you time to migrate components one by one later.
+
