@@ -1,9 +1,6 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
-import { types } from '../api_types';
-import { omegaup } from '../omegaup';
+import Vuex from '../vuex';
 
-Vue.use(Vuex);
 
 export interface RankingState {
   miniRankingUsers: omegaup.UserRank[];

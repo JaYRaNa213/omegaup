@@ -1,6 +1,7 @@
 // TODO: move logic from components inside this store
 
-import Vuex, { Commit, StoreOptions } from 'vuex';
+import Vuex, { Commit, StoreOptions } from '../vuex';
+
 import Vue from 'vue';
 
 import * as Util from './util';
@@ -102,7 +103,7 @@ const languageExtensionMapping: Record<string, string> = {};
 Object.keys(Util.supportedLanguages).forEach((key) => {
   languageExtensionMapping[key] = Util.supportedLanguages[key].extension;
 });
-Vue.use(Vuex);
+
 const storeOptions: StoreOptions<GraderStore> = {
   state: {
     alias: '',
@@ -354,9 +355,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       | undefined {
       return state.request.input.validator.custom_validator;
     },
-    inputCases(
-      state: GraderStore,
-    ): {
+    inputCases(state: GraderStore): {
       [key: string]: { in: string; out: string; weight?: number };
     } {
       return state.request.input.cases;

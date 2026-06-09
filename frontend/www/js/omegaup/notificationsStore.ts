@@ -1,9 +1,6 @@
 import Vue from 'vue';
-import Vuex, { ActionContext, Store } from 'vuex';
+import Vuex, { ActionContext, Store } from './vuex';
 
-// Vuex plugin registration is required before creating store instances.
-// Vue.use() is idempotent, so multiple registrations are safe.
-Vue.use(Vuex);
 
 /**
  * Message types for notifications, matching Bootstrap alert classes.

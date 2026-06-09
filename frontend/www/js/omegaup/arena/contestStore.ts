@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import Vuex, { Commit } from 'vuex';
+import Vuex from '../vuex';
+import { Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
 import {
@@ -8,7 +9,6 @@ import {
   ContestFilter,
 } from '../components/arena/ContestList.vue';
 
-Vue.use(Vuex);
 
 export interface UrlParams {
   page: number;

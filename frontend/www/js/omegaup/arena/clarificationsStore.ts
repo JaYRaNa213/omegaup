@@ -1,8 +1,6 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
-import { types } from '../api_types';
+import Vuex from '../vuex';
 
-Vue.use(Vuex);
 
 export interface ClarificationState {
   // The list of clarifications

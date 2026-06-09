@@ -1,10 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
-import { StoreState } from './types';
-import { casesStore } from './modules/cases';
-import T from '../../lang';
-
-Vue.use(Vuex);
+import Vuex from '../../vuex';
 
 const state: StoreState = {
   problemName: T.problemCreatorNewProblem,
